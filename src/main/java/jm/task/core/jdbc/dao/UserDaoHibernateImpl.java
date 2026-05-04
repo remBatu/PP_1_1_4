@@ -34,7 +34,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void dropUsersTable() {
-        try (Session session = sessionFactory.openSession();) {
+        try (Session session = sessionFactory.openSession()) {
             Transaction tx = session.beginTransaction();
             session.createNativeQuery("DROP TABLE IF EXISTS users").executeUpdate();
             tx.commit();
@@ -45,25 +45,19 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void saveUser(String name, String lastName, byte age) {
         Transaction tx = null;
-        Session session = null;
-        try {
-            session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             tx = session.beginTransaction();
             session.save(new User(name, lastName, age));
             tx.commit();
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-        } finally {
-            if (session != null) session.close();
         }
     }
 
     @Override
     public void removeUserById(long id) {
         Transaction tx = null;
-        Session session = null;
-        try {
-            session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             tx = session.beginTransaction();
             session.createQuery("DELETE FROM User u WHERE u.id = :id")
                     .setParameter("id", id)
@@ -71,8 +65,6 @@ public class UserDaoHibernateImpl implements UserDao {
             tx.commit();
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-        } finally {
-            if (session != null) session.close();
         }
     }
 
@@ -80,16 +72,12 @@ public class UserDaoHibernateImpl implements UserDao {
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
         Transaction tx = null;
-        Session session = null;
-        try {
-            session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             tx = session.beginTransaction();
             users = session.createQuery("FROM User", User.class).list();
             tx.commit();
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-        } finally {
-            if (session != null) session.close();
         }
         return users;
     }
